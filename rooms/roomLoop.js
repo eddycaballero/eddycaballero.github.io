@@ -210,6 +210,7 @@ var roomUpdate = function() {
     //Level Skip; comment this out for final build
     if (gameKeyboard.enter.isDown){
         console.info('skip');
+        player.reset();
         game.state.start(skip);
     }
     

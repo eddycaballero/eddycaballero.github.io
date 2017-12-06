@@ -23,7 +23,17 @@ var player = {
     moveLeft: function(velocity){
         direction = -1;
         if(!objectIsEmpty(this.playerBody)){
-            this.playerBody.animations.play('left');
+            if(this.ledgePoint == null){
+                this.playerBody.animations.play('left');  
+            } else {
+                this.playerBody.animations.stop();
+                if(this.ledgePoint.x < this.playerBody.body.x + this.playerBody.body.halfWidth){
+                    this.playerBody.frame = 28;
+                } else {
+                    this.playerBody.frame = 27;
+                }
+            }
+            
             if(player.invincibilityTimer == 0 && !this.crouching){
                 this.playerBody.body.velocity.x = -2*velocity;
             }
@@ -41,7 +51,16 @@ var player = {
     moveRight: function(velocity){
         direction = 1;
         if(!objectIsEmpty(this.playerBody)){
-            this.playerBody.animations.play('right');
+            if(this.ledgePoint == null){
+                this.playerBody.animations.play('right');
+            } else {
+                this.playerBody.animations.stop();
+                if(this.ledgePoint.x < this.playerBody.body.x + this.playerBody.body.halfWidth){
+                    this.playerBody.frame = 28;
+                } else {
+                    this.playerBody.frame = 27;
+                }
+            }
             if(player.invincibilityTimer == 0 && !this.crouching){
                 this.playerBody.body.velocity.x = 2*velocity;
             }
@@ -114,9 +133,10 @@ var player = {
             this.playerBody.body.setSize(200,304,0,0);
         }
         
-        this.soundFrames.walking = 0;
         //console.info('mouse x: ' + game.input.mousePointer.x)    ;
         //console.info('player body: ' + this.playerBody.body.x + this.playerBody.body.halfWidth);
+        
+        this.soundFrames.walking = 0;
         
         if(game.input.mousePointer.x + gameCamera.x < this.playerBody.body.x + this.playerBody.body.halfWidth){
             player.playerBody.frame = 20;
@@ -125,21 +145,12 @@ var player = {
             player.playerBody.frame = 21;
         };
         
-        if(platform.ledgePoints != undefined){
-            var radius;
-            
-            if(proximity != undefined){
-                radius = proximity;
-            } else {
-                radius = 10;
-            }
-            
-            if(Math.sqrt(Math.pow(this.playerBody.body.x - platform.ledgePoints[i].x,2) + Math.pow(this.playerBody.body.y - platform.ledgePoints[i].y,2)) < radius){
+        if(this.ledgePoint != null){
+            if(this.ledgePoint.x < this.playerBody.body.x + this.playerBody.body.halfWidth){
                 this.playerBody.frame = 28;
-            } else if((Math.sqrt(Math.pow(this.playerBody.body.x + this.playerBody.body.width - platform.ledgePoints[i].x,2) + Math.pow(this.playerBody.body.y - platform.ledgePoints[i].y,2)) < radius)){
+            } else {
                 this.playerBody.frame = 27;
             }
-                
         }
         
 /*        if(this.playerDirection > 0){
@@ -972,6 +983,7 @@ var player = {
         this.playerBody={};
         this.attackBody={};
         this.latchedObject = null;
+        this.ledgePoint = null;
         this.invincibilityTimer= 0;
         this.invincibilityFrames= 40;
         this.attackCooldown= 0;
